@@ -76,10 +76,13 @@ func main() {
 	// and call server.Run(ctx, &mcp.StdioTransport{}) instead of serving HTTP.
 	// getClient() already resolves credentials from the context, so no tool
 	// changes are needed.
-	// Create HTTP handler for MCP
+	// Create HTTP handler for MCP. Stateless mode is required for MCP 2026-07-28
+	// over Streamable HTTP while remaining compatible with older protocol versions.
 	mcpHandler := mcp.NewStreamableHTTPHandler(func(r *http.Request) *mcp.Server {
 		return server
-	}, nil)
+	}, &mcp.StreamableHTTPOptions{
+		Stateless: true,
+	})
 
 	// Set up HTTP routes
 	mux := http.NewServeMux()
